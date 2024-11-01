@@ -1,0 +1,114 @@
+﻿@model HorariosIPBejaMVC.Models.ViewModels.TimetableViewModel
+
+@{
+    ViewData["Title"] = "O meu horário";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Abas para navegação -->
+<ul class="nav nav-tabs" id="horarioTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="personal-tab" href="@Url.Action("HorariosPessoais", "Horario")" role="tab" aria-controls="personal" aria-selected="true">Horário Pessoal</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="referencial-tab" href="@Url.Action("HorariosReferenciais", "Horario")" role="tab" aria-controls="referencial" aria-selected="false">Horário Referencial</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="semanal-tab" href="@Url.Action("HorariosSemanais", "Horario")" role="tab" aria-controls="semanal" aria-selected="false">Horário Semanal</a>
+    </li>
+</ul>
+
+<!-- Mensagens de Feedback -->
+@if (TempData["MensagemErro"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["MensagemErro"]</div>
+}
+else if (TempData["MensagemSucesso"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["MensagemSucesso"]</div>
+}
+else if (!string.IsNullOrEmpty(Model.MensagemErro))
+{
+    <div class="alert alert-danger mt-3">@Model.MensagemErro</div>
+}
+else if (!string.IsNullOrEmpty(Model.MensagemResultado))
+{
+    <div class="alert alert-success mt-3">@Model.MensagemResultado</div>
+}
+
+<!-- Tabela de Horário -->
+@if (Model != null && Model.DiasDaSemana != null && Model.Periodos != null && Model.HorariosReferenciais != null)
+{
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Período / Dia</th>
+                @foreach (var dia in Model.DiasDaSemana)
+                {
+                    <th>@dia</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var periodo in Model.Periodos)
+            {
+                <tr>
+                    <td>@periodo</td>
+                    @foreach (var dia in Model.DiasDaSemana)
+                    {
+                        <td>
+                            @if (Model.HorariosReferenciais.ContainsKey(dia) && Model.HorariosReferenciais[dia].ContainsKey(periodo))
+                            {
+                                var horarios = Model.HorariosReferenciais[dia][periodo];
+                                if (horarios != null && horarios.Any())
+                                {
+                                    foreach (var horario in horarios)
+                                    {
+                                        <div class="mb-2">
+                                            <strong>UC:</strong> @(horario.uc?.nome ?? "N/A")<br />
+                                            <strong>Docente:</strong> @(horario.docente?.Nome ?? "N/A")<br />
+                                            <strong>Sala:</strong> @(horario.sala?.nome ?? "N/A")<br />
+                                            <strong>Tipo de Aula:</strong> @(horario.turma?.tipo_aula?.descricao ?? "N/A")<br />
+                                            <strong>Turma:</strong> @(horario.turma?.turma_label ?? "N/A")
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div>Vazio</div>
+                                }
+                            }
+                            else
+                            {
+                                <div>Vazio</div>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Não há dados disponíveis para exibir o horário.</p>
+}
+
+@section Scripts {
+    <script>
+        // Script para destacar a aba ativa com base na URL
+        document.addEventListener("DOMContentLoaded", function () {
+            var currentUrl = window.location.pathname;
+            var tabs = document.querySelectorAll('#horarioTab a.nav-link');
+
+            tabs.forEach(function (tab) {
+                if (tab.getAttribute('href') === currentUrl) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+        });
+    </script>
+}

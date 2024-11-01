@@ -1,0 +1,109 @@
+﻿@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Horários IP Beja</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome (opcional, para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Seu CSS personalizado -->
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <!-- Barra de Navegação Principal -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <!-- Logo -->
+                <a class="navbar-brand" href="#">
+                    <span class="fw-bold">Logo</span>
+                </a>
+                <!-- Nome da Aplicação -->
+                <span class="navbar-text ms-2">
+                    Horários IP Beja
+                </span>
+                <!-- Botão de colapso -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!-- Itens do menu principal -->
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNavMain">
+                    <ul class="navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link">Olá, @User.Identity.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Subbarra de Navegação - Só aparece após login e com roles apropriadas -->
+        @if (User.Identity.IsAuthenticated)
+        {
+            <nav class="navbar navbar-expand-lg navbar-dark bg-submenu-gray">
+                <div class="container-fluid">
+                    <!-- Botão de colapso para a subbarra -->
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSubMenu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <!-- Itens do submenu -->
+                    <div class="collapse navbar-collapse" id="navbarSubMenu">
+                        <ul class="navbar-nav">
+                            <!-- Link para a página de Horários -->
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["action"] as string == "Timetable" ? "active" : "")" asp-controller="Horario" asp-action="Timetable">Horários</a>
+                            </li>
+
+                            <!-- Link para "Gerar Horário" (só aparece se o utilizador tiver a role de Coordenador) -->
+                            @if (User.IsInRole("Coordenador"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Coordenador" asp-action="GerarHorario">Gerar Horário</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        }
+
+
+        <!-- Informação de Depuração (Remover em Produção) -->
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="container mt-2">
+                <div class="alert alert-info">
+                    <strong>Autenticado como:</strong> @User.Identity.Name <br />
+                    <strong>Roles:</strong> @string.Join(", ", User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value))
+                </div>
+            </div>
+        }
+    </header>
+
+    <!-- Conteúdo da página -->
+    <div class="container mt-4">
+        @RenderBody()
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="~/js/site.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

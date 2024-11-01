@@ -1,0 +1,255 @@
+﻿@model HorariosIPBejaMVC.Models.ViewModels.TimetableViewModel
+
+@{
+    ViewData["Title"] = "Horário Referencial";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Abas para navegação -->
+<ul class="nav nav-tabs" id="horarioTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="personal-tab" href="@Url.Action("HorariosPessoais", "Horario")" role="tab" aria-controls="personal" aria-selected="false">Horário Pessoal</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="referencial-tab" href="@Url.Action("HorariosReferenciais", "Horario")" role="tab" aria-controls="referencial" aria-selected="true">Horário Referencial</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="semanal-tab" href="@Url.Action("HorariosSemanais", "Horario")" role="tab" aria-controls="semanal" aria-selected="false">Horário Semanal</a>
+    </li>
+</ul>
+
+<!-- Mensagens de Feedback -->
+@if (TempData["MensagemErro"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["MensagemErro"]</div>
+}
+else if (TempData["MensagemSucesso"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["MensagemSucesso"]</div>
+}
+else if (!string.IsNullOrEmpty(Model.MensagemErro))
+{
+    <div class="alert alert-danger mt-3">@Model.MensagemErro</div>
+}
+else if (!string.IsNullOrEmpty(Model.MensagemResultado))
+{
+    <div class="alert alert-success mt-3">@Model.MensagemResultado</div>
+}
+
+<!-- Filtros de Escola, Curso e Semestre -->
+<div class="mt-4">
+    <form method="get" action="@Url.Action("HorariosReferenciais", "Horario")">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="escolaSelect">Escola</label>
+                <select id="escolaSelect" name="escolaId" class="form-control">
+                    <option value="" selected disabled>Selecione a Escola</option>
+                    @foreach (var escola in ViewBag.Escolas)
+                    {
+                        var selectedEscolaId = ViewContext.HttpContext.Request.Query["escolaId"].ToString();
+                        var isSelected = selectedEscolaId == escola.id.ToString();
+                        if (isSelected)
+                        {
+                            <option value="@escola.id" selected>@escola.nome</option>
+                        }
+                        else
+                        {
+                            <option value="@escola.id">@escola.nome</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="cursoSelect">Curso</label>
+                <select id="cursoSelect" name="cursoId" class="form-control" disabled>
+                    <option value="" selected disabled>Selecione o Curso</option>
+                    <!-- As opções serão carregadas via AJAX -->
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="semestreSelect">Semestre</label>
+                <select id="semestreSelect" name="semestre" class="form-control">
+                    <option value="" selected disabled>Selecione o Semestre</option>
+                    @for (int i = 1; i <= 6; i++)
+                    {
+                        var selectedSemestre = ViewContext.HttpContext.Request.Query["semestre"].ToString();
+                        var isSelected = selectedSemestre == i.ToString();
+                        if (isSelected)
+                        {
+                            <option value="@i" selected>@i</option>
+                        }
+                        else
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <!-- Botão de Filtro -->
+        <button type="submit" class="btn btn-primary mt-3">Aplicar Filtro</button>
+    </form>
+</div>
+
+<!-- Tabela de Horário -->
+@{
+    var hasData = Model != null && Model.HorariosReferenciais != null && Model.HorariosReferenciais.Any();
+}
+
+@if (hasData)
+{
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Período / Dia</th>
+                @foreach (var dia in Model.DiasDaSemana)
+                {
+                    <th>@dia</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var periodo in Model.Periodos)
+            {
+                <tr>
+                    <td>@periodo</td>
+                    @foreach (var dia in Model.DiasDaSemana)
+                    {
+                        <td>
+                            @if (Model.HorariosReferenciais.ContainsKey(dia) && Model.HorariosReferenciais[dia].ContainsKey(periodo))
+                            {
+                                var horarios = Model.HorariosReferenciais[dia][periodo];
+
+                                // Utilizar um HashSet para rastrear IDs já exibidos
+                                var horariosExibidos = new HashSet<int>();
+
+                                if (horarios != null && horarios.Any())
+                                {
+                                    foreach (var horario in horarios)
+                                    {
+                                        if (!horariosExibidos.Contains(horario.id))
+                                        {
+                                            <div class="mb-2">
+                                                <strong>UC:</strong> @(horario.uc?.nome ?? "N/A")<br />
+                                                <strong>Docente:</strong> @(horario.docente?.Nome ?? "N/A")<br />
+                                                <strong>Sala:</strong> @(horario.sala?.nome ?? "N/A")<br />
+                                                <strong>Tipo de Aula:</strong> @(horario.turma?.tipo_aula?.descricao ?? "N/A")<br />
+                                                <strong>Turma:</strong> @(horario.turma?.turma_label ?? "N/A")
+                                            </div>
+                                            horariosExibidos.Add(horario.id);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div>Vazio</div>
+                                }
+                            }
+                            else
+                            {
+                                <div>Vazio</div>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model != null && Model.HorariosReferenciais != null && !Model.HorariosReferenciais.Any())
+{
+    <p>Não há dados disponíveis para exibir o horário.</p>
+}
+<!-- Se Model for null ou nenhum filtro foi aplicado, não exibir nada -->
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Destacar a aba ativa
+            var currentUrl = window.location.pathname;
+            $('#horarioTab a.nav-link').each(function () {
+                if ($(this).attr('href') === currentUrl) {
+                    $(this).addClass('active');
+                } else {
+                    $(this).removeClass('active');
+                }
+            });
+
+            // Evento de mudança na seleção da Escola
+            $('#escolaSelect').change(function () {
+                var escolaId = $(this).val();
+                var cursoSelect = $('#cursoSelect');
+
+                // Limpar as opções atuais do Curso
+                cursoSelect.empty();
+                cursoSelect.append('<option value="" selected disabled>Selecione o Curso</option>');
+
+                if (escolaId) {
+                    // Fazer a chamada AJAX para obter os Cursos da Escola selecionada
+                    $.ajax({
+                        url: '@Url.Action("GetCursosByEscola", "Horario")',
+                        type: 'GET',
+                        data: { escolaId: escolaId },
+                        success: function (data) {
+                            if (data.length > 0) {
+                                // Preencher o Curso select com os dados retornados
+                                $.each(data, function (index, curso) {
+                                    cursoSelect.append('<option value="' + curso.id + '">' + curso.nome + '</option>');
+                                });
+
+                                // Habilitar o select de Curso
+                                cursoSelect.prop('disabled', false);
+                            } else {
+                                cursoSelect.append('<option value="" disabled>Nenhum Curso Disponível</option>');
+                                cursoSelect.prop('disabled', true);
+                            }
+                        },
+                        error: function () {
+                            alert('Erro ao carregar os cursos. Por favor, tente novamente.');
+                            cursoSelect.prop('disabled', true);
+                        }
+                    });
+                } else {
+                    // Se nenhuma Escola estiver selecionada, desabilitar o select de Curso
+                    cursoSelect.prop('disabled', true);
+                }
+            });
+
+            // Inicialmente desabilitar o select de Curso se nenhuma Escola estiver selecionada
+            if (!$('#escolaSelect').val()) {
+                $('#cursoSelect').prop('disabled', true);
+            } else {
+                // Se uma Escola estiver selecionada no carregamento (por exemplo, após aplicar filtro), carregar os Cursos correspondentes
+                var initialEscolaId = $('#escolaSelect').val();
+                if (initialEscolaId) {
+                    var cursoSelect = $('#cursoSelect');
+                    $.ajax({
+                        url: '@Url.Action("GetCursosByEscola", "Horario")',
+                        type: 'GET',
+                        data: { escolaId: initialEscolaId },
+                        success: function (data) {
+                            if (data.length > 0) {
+                                // Preencher o Curso select com os dados retornados
+                                $.each(data, function (index, curso) {
+                                    var selected = curso.id == '@(ViewContext.HttpContext.Request.Query["cursoId"])' ? 'selected' : '';
+                                    cursoSelect.append('<option value="' + curso.id + '" ' + selected + '>' + curso.nome + '</option>');
+                                });
+
+                                // Habilitar o select de Curso
+                                cursoSelect.prop('disabled', false);
+                            } else {
+                                cursoSelect.append('<option value="" disabled>Nenhum Curso Disponível</option>');
+                                cursoSelect.prop('disabled', true);
+                            }
+                        },
+                        error: function () {
+                            alert('Erro ao carregar os cursos. Por favor, tente novamente.');
+                            cursoSelect.prop('disabled', true);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+}

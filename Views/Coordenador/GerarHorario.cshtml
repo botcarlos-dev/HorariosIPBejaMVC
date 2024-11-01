@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Gerar Horário";
+}
+
+<h2>Gerar Horário</h2>
+
+<form asp-action="ExecutarGeracaoHorario" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">Gerar Horário</button>
+</form>
+
+@if (ViewBag.Resultado != null)
+{
+    <div class="alert @(ViewBag.Resultado.Contains("Erro") ? "alert-danger" : "alert-success")" role="alert">
+        <strong>@ViewBag.Resultado</strong>
+        @if (ViewBag.Erro != null)
+        {
+            <pre>@ViewBag.Erro</pre>
+        }
+    </div>
+}

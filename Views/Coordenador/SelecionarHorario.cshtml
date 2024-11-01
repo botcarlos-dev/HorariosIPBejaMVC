@@ -1,0 +1,87 @@
+﻿@model HorariosIPBejaMVC.Models.ViewModels.TimetableViewModel
+
+@{
+    ViewData["Title"] = "Selecionar Horário";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!string.IsNullOrEmpty(Model.MensagemErro))
+{
+    <div class="alert alert-danger">@Model.MensagemErro</div>
+}
+else if (!string.IsNullOrEmpty(Model.MensagemResultado))
+{
+    <div class="alert alert-success">@Model.MensagemResultado</div>
+}
+
+<!-- Exibição das Soluções de Horários -->
+<div class="accordion" id="horarioAccordion">
+    @for (int i = 0; i < Model.SolucoesHorarios.Count; i++)
+    {
+        var solucaoAtual = Model.SolucoesHorarios[i];
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-@i">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@i" aria-expanded="true" aria-controls="collapse-@i">
+                    Solução @(@i + 1) <!-- Contagem iniciando em 1 -->
+                </button>
+            </h2>
+            <div id="collapse-@i" class="accordion-collapse collapse @(i == 0 ? "show" : "")" aria-labelledby="heading-@i" data-bs-parent="#horarioAccordion">
+                <div class="accordion-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Período / Dia</th>
+                                @foreach (var dia in Model.DiasDaSemana)
+                                {
+                                    <th>@dia</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var periodo in Model.Periodos)
+                            {
+                                <tr>
+                                    <td>@periodo</td>
+                                    @foreach (var dia in Model.DiasDaSemana)
+                                    {
+                                        <td>
+                                            @{
+                                                var horarios = solucaoAtual.ContainsKey(dia) && solucaoAtual[dia].ContainsKey(periodo)
+                                                ? solucaoAtual[dia][periodo]
+                                                : null;
+                                            }
+
+                                            @if (horarios != null && horarios.Count > 0)
+                                            {
+                                                foreach (var item in horarios) // Exibe todas as aulas do período
+                                                {
+                                                    <div class="mb-2">
+                                                        <strong>UC:</strong> @item.uc.nome<br />
+                                                        <strong>Docente:</strong> @item.docente.Nome<br />
+                                                        <strong>Sala:</strong> @item.sala.nome<br />
+                                                        <strong>Tipo de Aula:</strong> @item.turma.tipo_aula.descricao<br />
+                                                        <strong>Turma:</strong> @item.turma.turma_label
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span>Vazio</span>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <form asp-action="SalvarHorarioSelecionado" method="post">
+                        <input type="hidden" name="solucaoIndex" value="@i" />
+                        <button type="submit" class="btn btn-primary mt-3">Salvar Esta Solução</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

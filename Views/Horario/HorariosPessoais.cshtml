@@ -1,0 +1,55 @@
+﻿@model HorariosIPBejaMVC.Models.HorariosPessoaisViewModel
+
+@{
+    ViewData["Title"] = "Horário Pessoal";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Período</th>
+                @foreach (var dia in Model.DiasDaSemana)
+                {
+                    <th>@dia</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var periodo in Model.Periodos.OrderBy(p => TimeSpan.Parse(p.Split('-')[0].Trim())))
+            {
+                <tr>
+                    <td>@periodo</td>
+                    @foreach (var dia in Model.DiasDaSemana)
+                    {
+                        <td>
+                            @{
+                                var horario = Model.HorariosPessoais.ContainsKey(dia) && Model.HorariosPessoais[dia].ContainsKey(periodo) ? Model.HorariosPessoais[dia][periodo] : null;
+                                if (horario != null)
+                                {
+                                    <strong>@horario.uc.nome</strong>
+                                    <br />
+                                    <span>Turma: @horario.turma.turma_label</span>
+                                    <br />
+                                    <span>Docente: @horario.docente.Nome</span>
+                                    <br />
+                                    <span>Sala: @horario.sala.nome</span>
+                                }
+                                else
+                                {
+                                    <em>---</em>
+                                }
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <a href="@Url.Action("Timetable", "Horario")" class="btn btn-secondary">Voltar ao Horário</a>
+</p>
