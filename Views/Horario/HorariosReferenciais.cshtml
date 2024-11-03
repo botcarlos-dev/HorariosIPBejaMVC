@@ -41,7 +41,27 @@ else if (!string.IsNullOrEmpty(Model.MensagemResultado))
 <div class="mt-4">
     <form method="get" action="@Url.Action("HorariosReferenciais", "Horario")">
         <div class="form-row">
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-3">
+                <label for="anoLetivoSelect">Ano Letivo</label>
+                <select id="anoLetivoSelect" name="anoLetivoId" class="form-control">
+                    <option value="" selected disabled>Selecione o Ano Letivo</option>
+                    @foreach (var ano in ViewBag.AnosLetivos)
+                    {
+                        var selectedAnoLetivoId = ViewContext.HttpContext.Request.Query["anoLetivoId"].ToString();
+                        var isSelected = selectedAnoLetivoId == ano.id.ToString();
+                        if (isSelected)
+                        {
+                            <option value="@ano.id" selected>@ano.descricao</option>
+                        }
+                        else
+                        {
+                            <option value="@ano.id">@ano.descricao</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group col-md-3">
                 <label for="escolaSelect">Escola</label>
                 <select id="escolaSelect" name="escolaId" class="form-control">
                     <option value="" selected disabled>Selecione a Escola</option>
@@ -60,14 +80,14 @@ else if (!string.IsNullOrEmpty(Model.MensagemResultado))
                     }
                 </select>
             </div>
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-3">
                 <label for="cursoSelect">Curso</label>
                 <select id="cursoSelect" name="cursoId" class="form-control" disabled>
                     <option value="" selected disabled>Selecione o Curso</option>
                     <!-- As opções serão carregadas via AJAX -->
                 </select>
             </div>
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-3">
                 <label for="semestreSelect">Semestre</label>
                 <select id="semestreSelect" name="semestre" class="form-control">
                     <option value="" selected disabled>Selecione o Semestre</option>
@@ -121,25 +141,22 @@ else if (!string.IsNullOrEmpty(Model.MensagemResultado))
                             {
                                 var horarios = Model.HorariosReferenciais[dia][periodo];
 
-                                // Utilizar um HashSet para rastrear IDs já exibidos
-                                var horariosExibidos = new HashSet<int>();
-
                                 if (horarios != null && horarios.Any())
                                 {
-                                    foreach (var horario in horarios)
-                                    {
-                                        if (!horariosExibidos.Contains(horario.id))
+                                    <!-- Contêiner flexível para exibição horizontal -->
+                                    <div class="horario-container">
+                                        @foreach (var horario in horarios)
                                         {
-                                            <div class="mb-2">
-                                                <strong>UC:</strong> @(horario.uc?.nome ?? "N/A")<br />
-                                                <strong>Docente:</strong> @(horario.docente?.Nome ?? "N/A")<br />
-                                                <strong>Sala:</strong> @(horario.sala?.nome ?? "N/A")<br />
-                                                <strong>Tipo de Aula:</strong> @(horario.turma?.tipo_aula?.descricao ?? "N/A")<br />
-                                                <strong>Turma:</strong> @(horario.turma?.turma_label ?? "N/A")
+                                            <!-- Bloco de cada turma, alinhado horizontalmente -->
+                                            <div class="horario-item">
+                                                <div><strong>UC:</strong> @(horario.uc?.nome ?? "N/A")</div>
+                                                <div><strong>Docente:</strong> @(horario.docente?.Nome ?? "N/A")</div>
+                                                <div><strong>Sala:</strong> @(horario.sala?.nome ?? "N/A")</div>
+                                                <div><strong>Tipo de Aula:</strong> @(horario.turma?.tipo_aula?.descricao ?? "N/A")</div>
+                                                <div><strong>Turma:</strong> @(horario.turma?.turma_label ?? "N/A")</div>
                                             </div>
-                                            horariosExibidos.Add(horario.id);
                                         }
-                                    }
+                                    </div>
                                 }
                                 else
                                 {
@@ -161,6 +178,8 @@ else if (Model != null && Model.HorariosReferenciais != null && !Model.HorariosR
 {
     <p>Não há dados disponíveis para exibir o horário.</p>
 }
+
+
 <!-- Se Model for null ou nenhum filtro foi aplicado, não exibir nada -->
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

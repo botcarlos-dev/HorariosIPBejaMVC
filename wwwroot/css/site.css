@@ -43,3 +43,28 @@ body {
     background-color: #6c757d; 
 }
 
+/* Contêiner para alinhar as turmas horizontalmente */
+.horario-container {
+    display: flex;
+    flex-direction: row; /* Garante que os itens fiquem na mesma linha */
+    gap: 20px; /* Espaçamento entre as turmas */
+    align-items: flex-start; /* Alinha os itens ao topo */
+}
+
+/* Estilo para cada bloco de turma */
+.horario-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    width: 200px; /* Largura fixa para forçar alinhamento lado a lado */
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Impede que os itens encolham em telas menores */
+}
+
+    /* Estilos internos das informações */
+    .horario-item div {
+        margin-bottom: 5px; /* Espaçamento entre cada linha de informação */
+    }
+
+

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore;
 
 namespace HorariosIPBejaMVC.Models;
@@ -32,6 +33,7 @@ public partial class TURMA
 
     [ForeignKey("docente_id")]
     [InverseProperty("TURMAs")]
+    
     public virtual DOCENTE docente { get; set; } = null!;
 
     [ForeignKey("tipo_aula_id")]

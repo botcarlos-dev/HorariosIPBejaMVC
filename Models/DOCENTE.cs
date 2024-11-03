@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+
 
 namespace HorariosIPBejaMVC.Models;
 
@@ -28,6 +30,7 @@ public partial class DOCENTE
     public virtual ICollection<HORARIO_SEMANAL> HORARIO_SEMANALs { get; set; } = new List<HORARIO_SEMANAL>();
 
     [InverseProperty("docente")]
+    
     public virtual ICollection<TURMA> TURMAs { get; set; } = new List<TURMA>();
 
     [InverseProperty("docente")]

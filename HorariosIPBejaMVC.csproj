@@ -16,4 +16,34 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Scripts\geradorHorarios.py" />
+    <None Include="wwwroot\Scripts\inspect_pickle.py" />
+    <None Include="wwwroot\Scripts\process_data.py" />
+    <None Include="wwwroot\Scripts\solution_reader.py" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Ano_Letivo.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\curso.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Docentes.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Horario_Referencial.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Indisponibilidade_Docentes.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Indisponibilidade_Salas.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Periodos_Horarios.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Salas.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Tipos_Aula.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\tipo_curso.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\TURMA.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\UC_Docente.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\UC_Duracao.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\UC_SALA.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\UC_TipoAula.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\UC_TurmaLabel.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\Unidades_Curriculares.xlsx" />
+    <None Include="wwwroot\Scripts\Tabelas_Excel\~%24Horario_Referencial.xlsx" />
+    <None Include="wwwroot\Scripts\timetable.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Scripts\LPFiles\" />
+  </ItemGroup>
+
 </Project>

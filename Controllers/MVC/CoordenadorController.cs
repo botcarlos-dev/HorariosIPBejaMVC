@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using HorariosIPBejaMVC.Data;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
@@ -15,6 +14,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using HorariosIPBejaMVC.Models.DTO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace HorariosIPBejaMVC.Controllers
 {
@@ -127,7 +127,7 @@ namespace HorariosIPBejaMVC.Controllers
                                 periodo_horario_id = horario.periodo_horario_id,
                                 uc_id = horario.uc_id,
                                 docente_id = horario.docente_id
-                                
+
                             }).ToList()
                         )
                     )
@@ -401,7 +401,7 @@ namespace HorariosIPBejaMVC.Controllers
                     {
                         // Carregar a turma incluindo o tipo_aula
                         var turma = _context.TURMAs
-                                            .Include(t => t.tipo_aula) 
+                                            .Include(t => t.tipo_aula)
                                             .FirstOrDefault(t => t.id == turmaId);
                         if (turma == null)
                         {
@@ -417,7 +417,7 @@ namespace HorariosIPBejaMVC.Controllers
                             periodo_horario_id = periodoId,
                             uc_id = turma.unidade_curricular_id,
                             docente_id = turma.docente_id,
-                            
+
                         };
 
                         // Carregar entidades relacionadas
@@ -452,3 +452,4 @@ namespace HorariosIPBejaMVC.Controllers
         }
     }
 }
+

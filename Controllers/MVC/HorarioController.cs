@@ -65,37 +65,31 @@ namespace HorariosIPBejaMVC.Controllers
         /// <param name="semestre">Número do semestre para filtrar os horários.</param>
         /// <returns>Vista dos horários referenciais filtrados.</returns>
         // GET: /Horario/HorariosReferenciais
-        public async Task<IActionResult> HorariosReferenciais(int? escolaId, int? cursoId, int? semestre)
+        public async Task<IActionResult> HorariosReferenciais(int? escolaId, int? cursoId, int? semestre, int? anoLetivoId)
         {
-            // Carregar as escolas e cursos para o filtro
+            // Carregar as escolas, cursos e anos letivos para o filtro
             var escolas = await _context.ESCOLAs.ToListAsync();
             var cursos = await _context.CURSOs.ToListAsync();
+            var anosLetivos = await _context.ANO_LETIVOs.ToListAsync();
 
             // Passar os dados para a ViewBag para uso na view
             ViewBag.Escolas = escolas;
             ViewBag.Cursos = cursos;
+            ViewBag.AnosLetivos = anosLetivos;
 
             var viewModel = new TimetableViewModel
             {
                 DiasDaSemana = new List<string> { "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira" },
                 Periodos = new List<string>
-                {
-                    "08:30 - 09:30",
-                    "09:30 - 10:30",
-                    "10:30 - 11:30",
-                    "11:30 - 12:30",
-                    "12:30 - 13:30",
-                    "13:30 - 14:30",
-                    "14:30 - 15:30",
-                    "15:30 - 16:30",
-                    "16:30 - 17:30",
-                    "17:30 - 18:30"
-                },
+        {
+            "08:30 - 09:30", "09:30 - 10:30", "10:30 - 11:30", "11:30 - 12:30", "12:30 - 13:30",
+            "13:30 - 14:30", "14:30 - 15:30", "15:30 - 16:30", "16:30 - 17:30", "17:30 - 18:30"
+        },
                 HorariosReferenciais = new Dictionary<string, Dictionary<string, List<HORARIO_REFERENCIAL>>>()
             };
 
-            // Verificar se os filtros estão aplicados
-            if (escolaId.HasValue && cursoId.HasValue && semestre.HasValue)
+            // Verificar se todos os filtros estão aplicados, incluindo o ano letivo
+            if (escolaId.HasValue && cursoId.HasValue && semestre.HasValue && anoLetivoId.HasValue)
             {
                 // Obter os dados filtrados
                 var horariosReferenciais = await _context.HORARIO_REFERENCIALs
@@ -106,7 +100,8 @@ namespace HorariosIPBejaMVC.Controllers
                     .Include(h => h.docente)
                     .Include(h => h.sala)
                     .Include(h => h.periodo_horario)
-                    .Where(h => h.uc.curso_id == cursoId.Value && h.uc.semestre == semestre.Value && h.uc.curso.escola_id == escolaId.Value)
+                    .Where(h => h.uc.curso_id == cursoId.Value && h.uc.semestre == semestre.Value
+                                && h.uc.curso.escola_id == escolaId.Value && h.ano_letivo_id == anoLetivoId.Value) // Filtro por Ano Letivo
                     .ToListAsync();
 
                 // Organizar os dados no ViewModel
@@ -131,6 +126,7 @@ namespace HorariosIPBejaMVC.Controllers
 
             return View("HorariosReferenciais", viewModel); // Carrega a view específica "HorariosReferenciais"
         }
+
 
         /// <summary>
         /// Obtém os horários referenciais filtrados com base nos parâmetros fornecidos e retorna em formato JSON.
